@@ -20,7 +20,7 @@ function draw() {
   const ctx = document.getElementById('canvas').getContext('2d');
 
   // Fill the canvas with cyan but at 5% opacity, to let movement smear
-  ctx.fillStyle = 'rgba(255, 99, 71, 0.03)';
+  ctx.fillStyle = 'rgba(255, 99, 71, 0.09)';
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
   // 1. Set the position of thing to be our point of reference
@@ -38,14 +38,14 @@ function draw() {
   ctx.stroke();
   
 
-  //ctx.beginPath();
-  //ctx.lineJoin = 'miter';
-  //ctx.moveTo(-thing.size / 2, -thing.size / 2); // Start top-left
-  //ctx.lineTo(thing.size / 2, -thing.size / 2); // Go top-right
-  //ctx.lineTo(thing.size / 2, thing.size / 2); // Down to bottom-right
-  ////ctx.lineTo(-thing.size / 2, thing.size / 2); // To bottom-left
-  //ctx.lineTo(-thing.size / 2, -thing.size / 2); // And up to top-left
-  //ctx.stroke();
+  // ctx.beginPath();
+  // ctx.lineJoin = 'miter';
+  // ctx.moveTo(-thing.size / 2, -thing.size / 2); // Start top-left
+  // ctx.lineTo(thing.size / 2, -thing.size / 2); // Go top-right
+  // ctx.lineTo(thing.size / 2, thing.size / 2); // Down to bottom-right
+  // ctx.lineTo(-thing.size / 2, thing.size / 2); // To bottom-left
+  // ctx.lineTo(-thing.size / 2, -thing.size / 2); // And up to top-left
+  // ctx.stroke();
 
 
   
@@ -67,8 +67,8 @@ function draw() {
   //   ctx.lineTo(x, y);
   //   angle += degreeSpacing;
   // }
-  ctx.closePath();
-  ctx.stroke();
+  // ctx.closePath();
+  // ctx.stroke();
 
 
   // Undo transformations
@@ -97,7 +97,7 @@ function behaviour() {
   // ---- Now use the processed data to influence the thing
   // 1. Increase rotation if there's a burst of loudness compared to recent
   let diff = waveD.avg - ampWindow.avg(); // Will be positive if we're louder, negative if softer
-  if (Math.abs(diff) < 0.01 && diff < 0) { // Only move if there's enough of a difference & it's louder
+  if (Math.abs(diff) > 0.01 && diff > 0) { // Only move if there's enough of a difference & it's louder
     thing.rotationVector += diff;
   }
 
@@ -222,7 +222,7 @@ function onMicSuccess(stream) {
   // Track the trend of each frequency bin as well
   freqWindows = [];
   for (var i = 0; i < analyser.fftSize / 2; i++) {
-    freqWindows[i] = new SlidingWindow(20);
+    freqWindows[i] = new SlidingWindow(100);
   }
 
   // smoothingTimeConstant ranges from 0.0 to 1.0
