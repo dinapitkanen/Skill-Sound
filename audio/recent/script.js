@@ -2,7 +2,7 @@ let audioCtx, analyser, ampWindow, freqWindows;
 
 class Thing {
   constructor() {
-    this.size = 100;
+    this.size = 60;
     this.state = 0;
     this.rotation = 0;
     this.rotationVector = 0;
@@ -20,7 +20,7 @@ function draw() {
   const ctx = document.getElementById('canvas').getContext('2d');
 
   // Fill the canvas with cyan but at 5% opacity, to let movement smear
-  ctx.fillStyle = 'rgba(0,255,255,0.05)';
+  ctx.fillStyle = 'rgba(255, 99, 71, 0.03)';
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
   // 1. Set the position of thing to be our point of reference
@@ -31,36 +31,45 @@ function draw() {
   //    this makes our job easier
   ctx.rotate(thing.rotation);
 
-  // 3. Draw our thing (a square)
+  // 3. Draw our thing (a circle)
   ctx.beginPath();
-  ctx.lineJoin = 'miter';
-  ctx.moveTo(-thing.size / 2, -thing.size / 2); // Start top-left
-  ctx.lineTo(thing.size / 2, -thing.size / 2); // Go top-right
-  ctx.lineTo(thing.size / 2, thing.size / 2); // Down to bottom-right
-  ctx.lineTo(-thing.size / 2, thing.size / 2); // To bottom-left
-  ctx.lineTo(-thing.size / 2, -thing.size / 2); // And up to top-left
+  ctx.arc(95,50,40,0,2*Math.PI);
+  ctx.strokeStyle = '#ffffff';
   ctx.stroke();
+  
 
+  //ctx.beginPath();
+  //ctx.lineJoin = 'miter';
+  //ctx.moveTo(-thing.size / 2, -thing.size / 2); // Start top-left
+  //ctx.lineTo(thing.size / 2, -thing.size / 2); // Go top-right
+  //ctx.lineTo(thing.size / 2, thing.size / 2); // Down to bottom-right
+  ////ctx.lineTo(-thing.size / 2, thing.size / 2); // To bottom-left
+  //ctx.lineTo(-thing.size / 2, -thing.size / 2); // And up to top-left
+  //ctx.stroke();
+
+
+  
   ctx.restore(); // Undo translate & rotation transformations
   ctx.save();
   ctx.translate(thing.x, thing.y); // Just use translation again
 
   // 4. Draw some lines around it
-  var angle = 0;
-  var degreeSpacing = Math.PI * 2 / thing.deformations.length;
-  ctx.beginPath();
+  // var angle = 0;
+  // var degreeSpacing = Math.PI * 2 / thing.deformations.length;
+  // ctx.beginPath();
 
-  const defaultDeformation = 0.5;
-  for (var i = 0; i < thing.deformations.length; i++) {
-    var radius = (thing.deformations[i]) ? thing.deformations[i] : defaultDeformation;
-    radius = (thing.size * radius) + thing.size;
-    let x = radius * Math.cos(angle);
-    let y = radius * Math.sin(angle);
-    ctx.lineTo(x, y);
-    angle += degreeSpacing;
-  }
+  // const defaultDeformation = 0.5;
+  // for (var i = 0; i < thing.deformations.length; i++) {
+  //   var radius = (thing.deformations[i]) ? thing.deformations[i] : defaultDeformation;
+  //   radius = (thing.size * radius) + thing.size;
+  //   let x = radius * Math.cos(angle);
+  //   let y = radius * Math.sin(angle);
+  //   ctx.lineTo(x, y);
+  //   angle += degreeSpacing;
+  // }
   ctx.closePath();
   ctx.stroke();
+
 
   // Undo transformations
   ctx.restore();
@@ -88,7 +97,7 @@ function behaviour() {
   // ---- Now use the processed data to influence the thing
   // 1. Increase rotation if there's a burst of loudness compared to recent
   let diff = waveD.avg - ampWindow.avg(); // Will be positive if we're louder, negative if softer
-  if (Math.abs(diff) > 0.00001 && diff > 0) { // Only move if there's enough of a difference & it's louder
+  if (Math.abs(diff) < 0.01 && diff < 0) { // Only move if there's enough of a difference & it's louder
     thing.rotationVector += diff;
   }
 
