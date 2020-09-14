@@ -12,7 +12,6 @@ html, body {
 
 body {
   padding: 2em;
-  transition: background-color ease-in-out 0.3s;
 }
 
 .hit {

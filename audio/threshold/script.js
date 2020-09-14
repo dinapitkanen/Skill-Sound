@@ -96,7 +96,7 @@ function thresholdFrequency(lowFreq, highFreq, freqData, threshold) {
   }
 
   // For debugging it can be useful to see maximum value within range
-  // console.log('Freq max: ' + max);
+  //console.log('Freq max: ' + max);
   return false;
 }
 

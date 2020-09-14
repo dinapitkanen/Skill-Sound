@@ -58,14 +58,16 @@ class Visualiser {
     this.element.addEventListener('pointerleave', (e) => { this.pointerDelaying = false; this.pointerDown = false; })
 
     document.getElementById('rendererComponentWaveReset').addEventListener('click', () => {
-      this.clear(document.getElementById('waveData'));
+      this.clear();
     });
   }
 
   renderFreq(freq) {
     if (!this.isExpanded()) return; // Don't render if collapsed
+    if (!freq) return; // Data is undefined/null
 
     const canvas = document.getElementById('rendererComponentFreqData');
+    // @ts-ignore
     const g = canvas.getContext('2d');
     const bins = freq.length;
     const canvasWidth = canvas.clientWidth;
@@ -143,8 +145,9 @@ class Visualiser {
   // Adapted from MDN's AnalyserNode.getFloatTimeDomainData() example
   renderWave(wave, bipolar = true) {
     if (!this.isExpanded()) return; // Don't render if collapsed
-
+    if (!wave) return; // Undefined or null data
     const canvas = document.getElementById('rendererComponentWaveData');
+    // @ts-ignore
     const g = canvas.getContext('2d');
     const canvasWidth = canvas.clientWidth;
     const canvasHeight = canvas.clientHeight;

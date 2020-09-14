@@ -129,13 +129,12 @@ function updateDisplay() {
   if (relative > 1.0) relative = 1; if (relative < 0) relative = 0;
 
   // Make some hue and lightness values from this percentage
-  const h = relative * 300;
-  const l = relative *90;
+  const h = relative * 360;
+  const l = relative * 80;
 
   // Update text readout
   document.getElementById('intervalMs').innerText = parseInt(currentIntervalMs) + ' ms.';
   document.getElementById('intervalBpm').innerText = currentBpm + ' bpm.';
-  document.getElementById('txt').style.fontSize = currentBpm + '%';
 
   // Set colour
   document.body.style.backgroundColor = 'hsl(' + h + ', 100%, ' + l + '%)';
