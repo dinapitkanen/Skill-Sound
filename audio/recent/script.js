@@ -1,8 +1,10 @@
 let audioCtx, analyser, ampWindow, freqWindows;
+let circleRadius = 40;
+let y = 0;
 
 class Thing {
   constructor() {
-    this.size = 60;
+    this.size = 30;
     this.state = 0;
     this.rotation = 0;
     this.rotationVector = 0;
@@ -20,7 +22,7 @@ function draw() {
   const ctx = document.getElementById('canvas').getContext('2d');
 
   // Fill the canvas with cyan but at 5% opacity, to let movement smear
-  ctx.fillStyle = 'rgba(255, 99, 71, 0.03)';
+  ctx.fillStyle = 'rgba(255, 99, 71, 0.2)';
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
   // 1. Set the position of thing to be our point of reference
@@ -32,8 +34,10 @@ function draw() {
   ctx.rotate(thing.rotation);
 
   // 3. Draw our thing (a circle)
+
   ctx.beginPath();
-  ctx.arc(95,50,40,0,2*Math.PI);
+  ctx.arc(95,50,circleRadius,0,2*Math.PI);
+  ctx.lineWidth = 15;
   ctx.strokeStyle = '#ffffff';
   ctx.stroke();
   
@@ -67,8 +71,8 @@ function draw() {
   //   ctx.lineTo(x, y);
   //   angle += degreeSpacing;
   // }
-  ctx.closePath();
-  ctx.stroke();
+  //ctx.closePath();
+  //ctx.stroke();
 
 
   // Undo transformations
@@ -97,7 +101,7 @@ function behaviour() {
   // ---- Now use the processed data to influence the thing
   // 1. Increase rotation if there's a burst of loudness compared to recent
   let diff = waveD.avg - ampWindow.avg(); // Will be positive if we're louder, negative if softer
-  if (Math.abs(diff) < 0.01 && diff < 0) { // Only move if there's enough of a difference & it's louder
+  if (Math.abs(diff) > 0.01 && diff > 0) { // Only move if there's enough of a difference & it's louder
     thing.rotationVector += diff;
   }
 
@@ -118,7 +122,7 @@ function behaviour() {
 
   // ---- Now apply the logic of the thing itself
   // 1. Rotation slows down to zero
-  if (Math.abs(thing.rotationVector) < 0.001) {
+  if (Math.abs(thing.rotationVector) < 0.1) {
     // if we're close enough to 0 set it to 0 to avoid oscillation
     thing.rotationVector = 0;
   } else if (thing.rotationVector != 0) {
@@ -126,15 +130,19 @@ function behaviour() {
     thing.rotationVector = (thing.rotationVector * 0.99) - 0.0001;
   }
 
+  // We want the circle to be able to pulsate, how?
+  //Math.sin(canvas) * r + Math.min.r == r - range;
+  //ellipse(width/2, height/2, 200 + micLevel*500, 200+ micLevel*500);
+
   // 2. Deformations want to shrink. Each loop, reduce by 30%
-  thing.deformations = thing.deformations.map(v => v * 0.7);
+  //thing.deformations = thing.deformations.map(v => v * 0.9);
 
   // --- Make sure values are within right ranges
   thing.rotationVector = clamp(thing.rotationVector, -5, 5);
   thing.deformations = thing.deformations.map(v => clamp(v, 0, 5));
 
   // Apply rotation
-  thing.rotation = thing.rotation + (thing.rotationVector * 0.1);
+  thing.rotation = thing.rotation + (thing.rotationVector * 0.09);
 }
 
 // Loops contunually, calling analyse and draw each time
@@ -195,14 +203,14 @@ function clamp(v, min, max) {
   return v;
 }
 
-// Scales an input value from a source range to a destination range.
-function scale(v, sourceMin, sourceMax, destMin, destMax) {
-  // eg: scale(70, 0, 70, 0, 5) = 70 is 100% on the scale of 0-70. Mapping that to the destination range of 0-5 gives 5 (100%)
-  // eg: scale(70, 60, 80, 0, 5) = 70 is 50% on the scale of 60-80. Mapping that to the same destination of 0-5 gives 2.5 instead (50%)
-  return (v - sourceMin) * (destMax - destMin) / (sourceMax - sourceMin) + destMin;
-}
+// // Scales an input value from a source range to a destination range.
+// function scale(v, sourceMin, sourceMax, destMin, destMax) {
+//   // eg: scale(70, 0, 70, 0, 5) = 70 is 100% on the scale of 0-70. Mapping that to the destination range of 0-5 gives 5 (100%)
+//   // eg: scale(70, 60, 80, 0, 5) = 70 is 50% on the scale of 60-80. Mapping that to the same destination of 0-5 gives 2.5 instead (50%)
+//   return (v - sourceMin) * (destMax - destMin) / (sourceMax - sourceMin) + destMin;
+// }
 
-// Microphone successfully initalised, now have access to audio data
+// Microphone successfully initalized, now have access to audio data
 function onMicSuccess(stream) {
   audioCtx = new AudioContext();
 
@@ -213,7 +221,7 @@ function onMicSuccess(stream) {
   analyser = audioCtx.createAnalyser();
 
   // Keep track of the last few amplitude readings
-  ampWindow = new SlidingWindow(10);
+  ampWindow = new SlidingWindow(3);
 
   // fftSize must be a power of 2. Higher values slower, more detailed
   // Range is 32-32768
@@ -228,7 +236,7 @@ function onMicSuccess(stream) {
   // smoothingTimeConstant ranges from 0.0 to 1.0
   // 0 = no averaging. Fast response, jittery
   // 1 = maximum averaging. Slow response, smooth
-  analyser.smoothingTimeConstant = 0.9;
+  //analyser.smoothingTimeConstant = 0.3;
 
   // Microphone -> analyser
   const micSource = audioCtx.createMediaStreamSource(stream);
