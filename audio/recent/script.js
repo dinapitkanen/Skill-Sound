@@ -31,7 +31,9 @@ function draw() {
 
   // 2. Rotate the whole canvas according to the object's rotation.
   //    this makes our job easier
-  ctx.rotate(thing.rotation);
+  ctx.rotate(thing.rotationVector);
+  // thing.rotationVector instead of thing.rotation. change back for all round movement.
+  // to have it force back movement to start position. Gives a forward movement with stepwise attribute. 
 
   // 3. Draw our thing (a circle)
 
@@ -117,12 +119,13 @@ function behaviour() {
     d = clamp(d, 0, 1);
 
     // Increases deformation the longer it's there
-    if (!thing.deformations[i]) thing.deformations[i] = 0; // Not yet set
-    thing.deformations[i] += d;
+    // if (!thing.deformations[i]) thing.deformations[i] = 0; // Not yet set
+    // thing.deformations[i] += d;
   }
 
   // ---- Now apply the logic of the thing itself
   // 1. Rotation slows down to zero
+  // Play with these numbers to make it be still or rotate. experimental use!
   if (Math.abs(thing.rotationVector) < 0.1) {
     // if we're close enough to 0 set it to 0 to avoid oscillation
     thing.rotationVector = 0;
@@ -248,57 +251,12 @@ function onMicSuccess(stream) {
   window.requestAnimationFrame(loop);
 }
 
-// Viggos threshold function
-function analyse() {
-  const bins = analyser.frequencyBinCount;
-  // Get frequency and amplitude data
-  const freq = new Float32Array(bins);
-  const wave = new Float32Array(bins);
-  analyser.getFloatFrequencyData(freq);
-  analyser.getFloatTimeDomainData(wave);
-  // Test whether we hit a threshold between 0-80Hz (bass region)
-  var hit = thresholdFrequency(200, 500, freq, -70);
-  var newHit = thresholdFrequency(500, 800, freq, -70);
-  var anotherHit = thresholdFrequency(800, 2000, freq, -70);
-  if (hit) {
-    document.getElementById('freqTarget').classList.add('hit');
-  } else if (newHit) {
-    document.getElementById('freqTarget').classList.add('newHit');
-  } else if (anotherHit) {
-    document.getElementById('freqTarget').classList.add('anotherHit');
-   }
-  // Test whether we hit an peak threshold (this can be a short burst of sound)
-  hit = thresholdPeak(wave, 0.3);
-  if (hit) {
-    document.getElementById('peakTarget').classList.add('hit');
-  }
-  newHit = thresholdPeak(wave, 0.6);
-  if (newHit) {
-    document.getElementById('peakTarget').classList.add('newHit');
-  }
-  anotherHit = thresholdPeak(wave, 0.9);
-  if (anotherHit) {
-    document.getElementById('peakTarget').classList.add('anotherHit');
-  }
-  // Test whether we hit a sustained (average) level
-  // This must be a longer, sustained noise.
-  // hit = thresholdSustained(wave, 0.3);
-  // if (hit) {
-  //   document.getElementById('susTarget').classList.add('hit');
-  // }
-  // Optional rendering of data
-  visualiser.renderWave(wave, true);
-  visualiser.renderFreq(freq);
-  // Run again
-  window.requestAnimationFrame(analyse);
-  }
 // Called whenever the window resizes. Fit canvas
 function onResize() {
   var canvas = document.getElementById('canvas');
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 }
-
 if (document.readyState != 'loading') {
   onDocumentReady();
 } else {

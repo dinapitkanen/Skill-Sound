@@ -16,8 +16,16 @@ body {
 
 .hit {
   background-color: deeppink;
+  /* box-shadow: 5px 10px; */
 }
-
+.newHit {
+  background-color: blue;
+  /* box-shadow: 10px 15px; */
+}
+.anotherHit {
+  background-color: green;
+  /* box-shadow: 15px 20px; */
+}
 .target {
   padding: 1em;
   border: 1px solid dimgray;
