@@ -88,6 +88,7 @@ function behaviour() {
   analyser.getFloatFrequencyData(freq);
   analyser.getFloatTimeDomainData(wave);
 
+
   // Get the min, max & average of this slice of waveform data
   // max: absolute max, min: absolute min, avg: average of absolute data
   let waveD = getMinMaxAvg(wave);
@@ -144,6 +145,7 @@ function behaviour() {
   // Apply rotation
   thing.rotation = thing.rotation + (thing.rotationVector * 0.09);
 }
+
 
 // Loops contunually, calling analyse and draw each time
 function loop() {
@@ -246,6 +248,50 @@ function onMicSuccess(stream) {
   window.requestAnimationFrame(loop);
 }
 
+// Viggos threshold function
+function analyse() {
+  const bins = analyser.frequencyBinCount;
+  // Get frequency and amplitude data
+  const freq = new Float32Array(bins);
+  const wave = new Float32Array(bins);
+  analyser.getFloatFrequencyData(freq);
+  analyser.getFloatTimeDomainData(wave);
+  // Test whether we hit a threshold between 0-80Hz (bass region)
+  var hit = thresholdFrequency(200, 500, freq, -70);
+  var newHit = thresholdFrequency(500, 800, freq, -70);
+  var anotherHit = thresholdFrequency(800, 2000, freq, -70);
+  if (hit) {
+    document.getElementById('freqTarget').classList.add('hit');
+  } else if (newHit) {
+    document.getElementById('freqTarget').classList.add('newHit');
+  } else if (anotherHit) {
+    document.getElementById('freqTarget').classList.add('anotherHit');
+   }
+  // Test whether we hit an peak threshold (this can be a short burst of sound)
+  hit = thresholdPeak(wave, 0.3);
+  if (hit) {
+    document.getElementById('peakTarget').classList.add('hit');
+  }
+  newHit = thresholdPeak(wave, 0.6);
+  if (newHit) {
+    document.getElementById('peakTarget').classList.add('newHit');
+  }
+  anotherHit = thresholdPeak(wave, 0.9);
+  if (anotherHit) {
+    document.getElementById('peakTarget').classList.add('anotherHit');
+  }
+  // Test whether we hit a sustained (average) level
+  // This must be a longer, sustained noise.
+  // hit = thresholdSustained(wave, 0.3);
+  // if (hit) {
+  //   document.getElementById('susTarget').classList.add('hit');
+  // }
+  // Optional rendering of data
+  visualiser.renderWave(wave, true);
+  visualiser.renderFreq(freq);
+  // Run again
+  window.requestAnimationFrame(analyse);
+  }
 // Called whenever the window resizes. Fit canvas
 function onResize() {
   var canvas = document.getElementById('canvas');

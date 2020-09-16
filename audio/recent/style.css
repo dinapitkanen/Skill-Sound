@@ -16,7 +16,25 @@ body {
 }
 
 #canvas {
-  top: 0;
+  top: 100;
   left: 0;
-  position: absolute;
+  /*position: absolute;*/
+}
+
+.hit {
+  background-color: deeppink;
+  /* box-shadow: 5px 10px; */
+}
+.newHit {
+  background-color: blue;
+  /* box-shadow: 10px 15px; */
+}
+.anotherHit {
+  background-color: green;
+  /* box-shadow: 15px 20px; */
+}
+.target {
+  padding: 1em;
+  border: 1px solid dimgray;
+  display: inline-block;
 }
