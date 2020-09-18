@@ -31,7 +31,7 @@ function draw() {
 
   // 2. Rotate the whole canvas according to the object's rotation.
   //    this makes our job easier
-  ctx.rotate(thing.rotationVector);
+  ctx.rotate(thing.rotation);
   // thing.rotationVector instead of thing.rotation. change back for all round movement.
   // to have it force back movement to start position. Gives a forward movement with stepwise attribute. 
 
@@ -126,7 +126,7 @@ function behaviour() {
   // ---- Now apply the logic of the thing itself
   // 1. Rotation slows down to zero
   // Play with these numbers to make it be still or rotate. experimental use!
-  if (Math.abs(thing.rotationVector) < 0.1) {
+  if (Math.abs(thing.rotation) < 0) {
     // if we're close enough to 0 set it to 0 to avoid oscillation
     thing.rotationVector = 0;
   } else if (thing.rotationVector != 0) {
